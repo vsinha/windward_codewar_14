@@ -125,11 +125,10 @@ class MyPlayerBrain(object):
                 
             # coffee store override
             # get coffee if we're ever out and don't have a passenger, or if close to a coffee store anyway, pick up
-            if (self.me.limo.coffeeServings <= 0 and
-                self.me.limo.passenger is None
-                or (self.me.limo.coffeeServings == 1 and
-                    self.me.limo.passenger is None and
-                    self.closestStoreCost(self.me, self.stores) <= 10)) :
+
+            if (self.me.limo.passenger is None and
+                    (self.me.limo.coffeeServings is 0) or
+                    (self.me.limo.coffeeServices is 1 and self.closestStore(self.me, self.stores) <= 10)):
                 print "looking for coffee"
                 ptDest = self.closestStore(self.me, self.stores).busStop
 
