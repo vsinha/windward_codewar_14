@@ -274,6 +274,15 @@ class MyPlayerBrain(object):
                 cost=( distToPassenger + distToDest) / passenger.pointsDelivered
                 passengerCosts.append((passenger,cost))
 
+            # eliminate passengers someone else will get first
+            handicap=0
+            for i,passenger in enumerate(pickup):
+                for player in self.players:
+                    if(player.pickup is not None):
+                        if(passenger in player.pickup and not player.limo.passenger is None):
+                            if(len(player.limo.path)<(len(me.limo.path)-handicap)):
+                                print("Someone else would get there first\n Removing "+str(i)+" of "+str(len(pickup)))
+                                del pickup[i]
             # sort & print
             passengerCosts=sorted(passengerCosts,key=lambda x:x[1])
             print passengerCosts
@@ -293,13 +302,16 @@ class MyPlayerBrain(object):
                 cost=( distToPassenger + distToDest) / passenger.pointsDelivered
                 passengerCosts.append((passenger,cost))
 
-
             # eliminate passengers someone else will get first
+            handicap=0
             for i,passenger in enumerate(pickup):
                 for player in self.players:
-                    if(passenger in player.pickup[0]):
-                        if(len(player.limo.path)<(len(me.limo.path)-2)):
-                            del pickup[i]
+                    if(player.pickup is not None):
+                        if(passenger in player.pickup and not player.limo.passenger is None):
+                            if(len(player.limo.path)<(len(me.limo.path)-handicap)):
+                                print("Someone else would get there first\n Removing "+str(i)+" of "+str(len(pickup)))
+                                del pickup[i]
+
 
 
             # sort
