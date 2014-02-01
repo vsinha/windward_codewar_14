@@ -209,18 +209,6 @@ class MyPlayerBrain(object):
             return
         powerUp = okToPlayHand[0]
         
-        # 10% discard, 90% play
-        if rand.randint(1, 10) == 1:
-            playerPowerSend(self, "DISCARD", powerUp)
-        else:
-            if powerUp.card == "MOVE_PASSENGER":
-                powerUp.passenger = rand.choice(filter(lambda p: p.car is None, self.passengers))
-            if powerUp.card == "CHANGE_DESTINATION" or powerUp.card == "STOP_CAR":
-                playersWithPassengers = filter(lambda p: p.guid != self.me.guid and p.limo.passenger is not None, self.players)
-                if len(playersWithPassengers) == 0:
-                    return
-                powerUp.player = rand.choice(playersWithPassengers)
-
         if (powerUp.card == "MULT_DELIVERING_PASSENGER" or
             powerUp.card == "MULT_DELIVER_AT_COMPANY"):
             # we need extra coffee for these
