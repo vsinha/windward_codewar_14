@@ -198,6 +198,13 @@ class TrailPoint(object):
             neighborOn.costFromStart = self.costFromStart + 1
             neighborOn.recalculateFromStart(self.mapTile, remainingSteps)
 
+    def calculateDistanceWithTurns(self,path):
+        turns = 0
+        for x in len(path)-2:
+            if (path[x][0] - path[x+2][0] != 0 and path[x][1] - path[x+2][1] != 0):
+                turns += 1
+        return [len(path),turns]
+
     def recalculateDistance(self, mapTileCaller, remainingSteps):
         neighbors = self.neighbors
         trap(self.costToEnd == 0)
