@@ -137,7 +137,7 @@ class MyPlayerBrain(object):
             #get coffee if we're ever out and don't have a passenger, or if close to a coffee store anyway, pick up
             if (self.me.limo.coffeeServings <= 0 and
                 self.me.limo.passenger is None
-                or (self.me.limo.coffeServings == 1 and
+                or (self.me.limo.coffeeServings == 1 and
                     self.me.limo.passenger is None and
                     self.closestStoreCost(self.me, self.stores) <= 10)) :
                 print "looking for coffee"
@@ -227,7 +227,7 @@ class MyPlayerBrain(object):
 
         if powerUp.card == "MULT_DELIVER_AT_COMPANY":
             # if we're already going to the destination, play this card
-            if powerUp.company == self.me.limo.passenger.destination.name:
+            if self.me.limo.passenger is not None and powerUp.company == self.me.limo.passenger.destination.name:
                 playerPowerSend(self, "PLAY", powerUp)
             return
 
