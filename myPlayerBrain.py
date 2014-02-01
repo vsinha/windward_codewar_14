@@ -138,6 +138,7 @@ class MyPlayerBrain(object):
                     ptDest = pickup[0].lobby.busStop
 
             if(ptDest is None):
+                print("no destination")
                 return
 
             self.displayOrders(ptDest)
