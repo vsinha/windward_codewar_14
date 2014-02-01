@@ -209,21 +209,49 @@ class MyPlayerBrain(object):
         if len(okToPlayHand) == 0:
             return
         powerUp = okToPlayHand[0]
-        
-        # 10% discard, 90% play
-        if rand.randint(1, 10) == 1:
-            playerPowerSend(self, "DISCARD", powerUp)
-        else:
-            if powerUp.card == "MOVE_PASSENGER":
-                powerUp.passenger = rand.choice(filter(lambda p: p.car is None, self.passengers))
-            if powerUp.card == "CHANGE_DESTINATION" or powerUp.card == "STOP_CAR":
-                playersWithPassengers = filter(lambda p: p.guid != self.me.guid and p.limo.passenger is not None, self.players)
-                if len(playersWithPassengers) == 0:
-                    return
-                powerUp.player = rand.choice(playersWithPassengers)
 
+        # always discard this one
+        if powerUp.card == "MULT_DELIVERY_QUARTER_SPEED":
+            playerPowerSend(self, "DISCARD", powerUp)
+
+        if (powerUp.card == "MULT_DELIVERING_PASSENGER" or
+            powerUp.card == "MULT_DELIVER_AT_COMPANY"):
+            # we need extra coffee for these
+            # don't play if we don't have enough coffee
+            if self.me.limo.coffeeServings <= 1:
+                return
+
+        if powerUp.card == "MULT_DELIVER_AT_COMPANY":
+            # if we're already going to the destination, play this card
+            if powerUp.company == self.me.limo.passenger.destination.name:
+                playerPowerSend(self, "PLAY", powerUp)
+
+        if powerUp.card == "MOVE_PASSENGER":
+            powerUp.passenger = rand.choice(filter(lambda p: p.car is None, self.passengers))
             playerPowerSend(self, "PLAY", powerUp)
-            print "Playing powerup " + powerUp.card
+
+        if powerUp.card == "CHANGE_DESTINATION":
+            # highest score player with a passenger in the car plus points delivered if they deliver the passenger they have
+            playersWithPassengers = filter(lambda p: p.guid != self.me.guid and p.limo.passenger is not None, self.players)
+            playersWithPassengers = sorted(playersWithPassengers, key=lambda x: x.score + x.limo.passenger.pointsDelivered, reverse=True)
+            if len(playersWithPassengers) == 0:
+                return
+            powerUp.player = playersWithPassengers[0]
+            playerPowerSend(self, "PLAY", powerUp)
+
+        if powerUp.card == "STOP_CAR":
+            # highest score player with or w/o passenger plus points delivered if they deliver the passenger they have
+            playersWithPassengers = filter(lambda p: p.guid != self.me.guid, self.players)
+            playersWithPassengers = sorted(playersWithPassengers, key=lambda x: x.score + x.limo.passenger.pointsDelivered if x.limo.passenger is not None else x.score, reverse=True)
+            if len(playersWithPassengers) == 0:
+                return
+            powerUp.player = playersWithPassengers[0]
+            playerPowerSend(self, "PLAY", powerUp)
+
+
+
+
+        print "Playing powerup " + powerUp.card
         self.powerUpHand.remove(powerUp)
         
         return
@@ -315,3 +343,16 @@ class MyPlayerBrain(object):
         storeCosts = sorted(storeCosts, key=lambda x:x[1])
 
         return storeCosts[0][0]
+
+    def closestStoreCost(self, me, stores):
+        storeCosts=[]
+        for store in stores:
+            distToStore=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, store.busStop))
+            distToNextPickup = self.allPickupCosts(me, self.passengers)[1]
+            cost = distToStore + distToNextPickup
+            storeCosts.append((store,cost))
+
+        # sort
+        storeCosts = sorted(storeCosts, key=lambda x:x[1])
+
+        return storeCosts[0][1]
