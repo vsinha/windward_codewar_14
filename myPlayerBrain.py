@@ -116,8 +116,15 @@ class MyPlayerBrain(object):
                 pickup = self.allPickups(self.me, self.passengers)
                 ptDest = pickup[0].lobby.busStop
             elif  status == "PASSENGER_REFUSED_ENEMY":
-                ptDest = rand.choice(filter(lambda c: c != self.me.limo.passenger.destination,
-                    self.companies)).busStop
+                #ptDest = rand.choice(filter(lambda c: c != self.me.limo.passenger.destination,
+                #    self.companies)).busStop
+
+                pickups = self.allPickups(self.me, self.passengers)
+                for p in pickups:
+                    if p is not self.me.limo.passenger.destination:
+                        ptDest = p
+                        break
+
             elif (status == "PASSENGER_DELIVERED_AND_PICKED_UP" or
                   status == "PASSENGER_PICKED_UP"):
                 pickup = self.allPickups(self.me, self.passengers)
@@ -125,12 +132,12 @@ class MyPlayerBrain(object):
                 
             # coffee store override
             # get coffee if we're ever out and don't have a passenger, or if close to a coffee store anyway, pick up
-
-            if (self.me.limo.passenger is None and
-                    ((self.me.limo.coffeeServings is 0) or
-                    (self.me.limo.coffeeServings is 1 and self.closestStoreCost(self.me, self.stores) <= 10))):
-                print "looking for coffee"
-                ptDest = self.closestStore(self.me, self.stores).busStop
+            if (self.me.limo.coffeeServings <= 1) :
+                if (self.me.limo.passenger is None and
+                        ((self.me.limo.coffeeServings == 0) or
+                        (self.me.limo.coffeeServings == 1 and self.closestStoreCost(self.me, self.stores) <= 10))):
+                    print "looking for coffee"
+                    ptDest = self.closestStore(self.me, self.stores).busStop
 
             if(status == "COFFEE_STORE_CAR_RESTOCKED"):
                 pickup = self.allPickups(self.me, self.passengers)
@@ -307,7 +314,7 @@ class MyPlayerBrain(object):
                                             p.lobby is not None and p.destination is not None)]
 
         # eliminate passengers someone else will get first
-        #pickup=[p for p in pickup if not self.isOthersPriority(p)]
+        pickup=[p for p in pickup if not self.isOthersPriority(p)]
 
         passengerCosts=[]
         for passenger in pickup:
@@ -336,7 +343,7 @@ class MyPlayerBrain(object):
                                             p.lobby is not None and p.destination is not None)]
 
         # eliminate passengers someone else will get first
-        #pickup=[p for p in pickup if not self.isOthersPriority(p)]
+        pickup=[p for p in pickup if not self.isOthersPriority(p)]
 
         passengerCosts=[]
         for passenger in pickup:
