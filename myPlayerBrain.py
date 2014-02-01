@@ -270,14 +270,14 @@ class MyPlayerBrain(object):
                 passengerCosts.append((passenger,cost))
 
             # print before weighting
-            passengerCosts=sorted(passengerCosts,key=lambda x:x[1])
-            print passengerCosts
+            # passengerCosts=sorted(passengerCosts,key=lambda x:x[1])
+            # print passengerCosts
 
             # weight for points by passenger
             for n in range(0, len(passengerCosts)):
                 passengerCosts[n] = ( passengerCosts[n][0], passengerCosts[n][1] / passengerCosts[n][0].pointsDelivered )
 
-            # sort & print again
+            # sort & print
             passengerCosts=sorted(passengerCosts,key=lambda x:x[1])
             print passengerCosts
 
