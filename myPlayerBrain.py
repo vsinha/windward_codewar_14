@@ -125,13 +125,21 @@ class MyPlayerBrain(object):
                 ptDest = self.me.limo.passenger.destination.busStop
                 
             # coffee store override
+            """
             if(status == "PASSENGER_DELIVERED_AND_PICKED_UP" or status == "PASSENGER_DELIVERED" or status == "PASSENGER_ABANDONED"):
                 if(self.me.limo.coffeeServings <= 0):
                     #ptDest = rand.choice(self.stores).busStop #wat... goes to random coffee place
                     ptDest = self.closestStore(self.me, self.stores).busStop
             elif(status == "PASSENGER_REFUSED_NO_COFFEE" or status == "PASSENGER_DELIVERED_AND_PICK_UP_REFUSED"):
                 ptDest = self.closestStore(self.me, self.stores).busStop
-            elif(status == "COFFEE_STORE_CAR_RESTOCKED"):
+            """
+
+            #get coffee if we're ever out and don't have a passenger
+            if (self.me.limo.coffeeServings <= 0 and self.me.limo.passenger is None) :
+                print "looking for coffee"
+                ptDest = self.closestStore(self.me, self.stores).busStop
+
+            if(status == "COFFEE_STORE_CAR_RESTOCKED"):
                 pickup = self.allPickups(self.me, self.passengers)
                 if len(pickup) != 0:
                     ptDest = pickup[0].lobby.busStop
@@ -296,16 +304,14 @@ class MyPlayerBrain(object):
             return [p[1] for p in passengerCosts]
 
     def closestStore(self, me, stores):
-        print "looking for coffee"
         storeCosts=[]
         for store in stores:
-            distToStore=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, store.lobby.busStop))
+            distToStore=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, store.busStop))
             distToNextPickup = self.allPickupCosts(me, self.passengers)[1]
             cost = distToStore + distToNextPickup
             storeCosts.append((store,cost))
 
         # sort
         storeCosts = sorted(storeCosts, key=lambda x:x[1])
-        print storeCosts
 
-        return [s[1] for s in storeCosts]
+        return storeCosts[0][0]
