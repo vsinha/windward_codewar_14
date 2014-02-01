@@ -12,7 +12,7 @@ import traceback
 import simpleAStar
 from framework import sendOrders, playerPowerSend
 
-NAME = "Sunshine Ponies"
+NAME = "Sunshine Ninja Ponies"
 SCHOOL = "Purdue"
 
 class MyPlayerBrain(object):
@@ -128,7 +128,7 @@ class MyPlayerBrain(object):
 
             if (self.me.limo.passenger is None and
                     (self.me.limo.coffeeServings is 0) or
-                    (self.me.limo.coffeeServices is 1 and self.closestStore(self.me, self.stores) <= 10)):
+                    (self.me.limo.coffeeServings is 1 and self.closestStore(self.me, self.stores) <= 10)):
                 print "looking for coffee"
                 ptDest = self.closestStore(self.me, self.stores).busStop
 
@@ -331,6 +331,11 @@ class MyPlayerBrain(object):
             distToPassenger=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, passenger.lobby.busStop))
             distToDest=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, passenger.destination.busStop))
             cost=( distToPassenger + distToDest) / passenger.pointsDelivered
+            for enemy in passenger.enemies:
+                if enemy in passenger.destination.passengers:
+                    #GTFO
+                    print ("enemy at destination for passenger: ", passenger)
+                    cost += 500
             passengerCosts.append((passenger,cost))
 
         # sort
@@ -343,7 +348,7 @@ class MyPlayerBrain(object):
         storeCosts=[]
         for store in stores:
             distToStore=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, store.busStop))
-            distToNextPickup = self.allPickupCosts(me, self.passengers)[1]
+            distToNextPickup = self.allPickupCosts(me, self.passengers)[0]
             cost = distToStore + distToNextPickup
             storeCosts.append((store,cost))
 
