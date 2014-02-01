@@ -208,9 +208,14 @@ class MyPlayerBrain(object):
         if len(okToPlayHand) == 0:
             return
         powerUp = okToPlayHand[0]
+
+        if (powerUp.card == "MULT_DELIVERY_QUARTER_SPEED"):
+            playerPowerSend(self, "DISCARD", powerUp)
+            return
         
         if (powerUp.card == "MULT_DELIVERING_PASSENGER" or
-            powerUp.card == "MULT_DELIVER_AT_COMPANY"):
+            powerUp.card == "MULT_DELIVER_AT_COMPANY" or
+            powerUp.card == "MULT_DELIVERY_QUARTER_SPEED"):
             # we need extra coffee for these
             # don't play if we don't have enough coffee
             if self.me.limo.coffeeServings <= 1:
@@ -220,10 +225,12 @@ class MyPlayerBrain(object):
             # if we're already going to the destination, play this card
             if powerUp.company == self.me.limo.passenger.destination.name:
                 playerPowerSend(self, "PLAY", powerUp)
+            return
 
         if powerUp.card == "MOVE_PASSENGER":
             powerUp.passenger = rand.choice(filter(lambda p: p.car is None, self.passengers))
             playerPowerSend(self, "PLAY", powerUp)
+            return
 
         if powerUp.card == "CHANGE_DESTINATION":
             # highest score player with a passenger in the car plus points delivered if they deliver the passenger they have
@@ -233,6 +240,7 @@ class MyPlayerBrain(object):
                 return
             powerUp.player = playersWithPassengers[0]
             playerPowerSend(self, "PLAY", powerUp)
+            return
 
         if powerUp.card == "STOP_CAR":
             # highest score player with or w/o passenger plus points delivered if they deliver the passenger they have
@@ -242,9 +250,11 @@ class MyPlayerBrain(object):
                 return
             powerUp.player = playersWithPassengers[0]
             playerPowerSend(self, "PLAY", powerUp)
+            return
 
 
-
+        #if we get here, just play the card
+        playerPowerSend(self, "PLAY", powerUp)
 
         print "Playing powerup " + powerUp.card
         self.powerUpHand.remove(powerUp)
