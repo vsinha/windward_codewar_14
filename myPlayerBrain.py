@@ -191,8 +191,7 @@ class MyPlayerBrain(object):
         return path
     
     def maybePlayPowerUp(self):
-        if len(self.powerUpHand) is not 0 and rand.randint(0, 50) < 30:
-            return
+
         # not enough, draw
         if len(self.powerUpHand) < self.me.maxCardsInHand and len(self.powerUpDeck) > 0:
             for card in self.powerUpDeck:
@@ -209,10 +208,18 @@ class MyPlayerBrain(object):
         if len(okToPlayHand) == 0:
             return
         powerUp = okToPlayHand[0]
-
-        # always discard this one
-        if powerUp.card == "MULT_DELIVERY_QUARTER_SPEED":
+        
+        # 10% discard, 90% play
+        if rand.randint(1, 10) == 1:
             playerPowerSend(self, "DISCARD", powerUp)
+        else:
+            if powerUp.card == "MOVE_PASSENGER":
+                powerUp.passenger = rand.choice(filter(lambda p: p.car is None, self.passengers))
+            if powerUp.card == "CHANGE_DESTINATION" or powerUp.card == "STOP_CAR":
+                playersWithPassengers = filter(lambda p: p.guid != self.me.guid and p.limo.passenger is not None, self.players)
+                if len(playersWithPassengers) == 0:
+                    return
+                powerUp.player = rand.choice(playersWithPassengers)
 
         if (powerUp.card == "MULT_DELIVERING_PASSENGER" or
             powerUp.card == "MULT_DELIVER_AT_COMPANY"):
@@ -325,8 +332,18 @@ class MyPlayerBrain(object):
                 cost=( distToPassenger + distToDest) / passenger.pointsDelivered
                 passengerCosts.append((passenger,cost))
 
+
+            # eliminate passengers someone else will get first
+            for i,passenger in enumerate(pickup):
+                for player in self.players:
+                    if(passenger in player.pickup[0]):
+                        if(len(player.limo.path)<(len(me.limo.path)-2)):
+                            del pickup[i]
+
+
             # sort
             passengerCosts=sorted(passengerCosts,key=lambda x:x[1])
+
 
             # returns cost
             return [p[1] for p in passengerCosts]
