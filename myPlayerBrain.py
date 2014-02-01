@@ -12,7 +12,7 @@ import traceback
 import simpleAStar
 from framework import sendOrders, playerPowerSend
 
-NAME = "Sunshine Ponies"
+NAME = "Sunshine Ponies 2"
 SCHOOL = "Purdue"
 
 class MyPlayerBrain(object):
@@ -348,7 +348,7 @@ class MyPlayerBrain(object):
             for i,passenger in enumerate(pickup):
                 for player in self.players:
                     if(player.pickup is not None):
-                        if(passenger in player.pickup and not player.limo.passenger is None):
+                        if(passenger is player.pickup[0] and player.limo.passenger is not None):
                             if(len(player.limo.path)<(len(me.limo.path)-handicap)):
                                 print("Someone else would get there first\n Removing "+str(i)+" of "+str(len(pickup)))
                                 del pickup[i]
