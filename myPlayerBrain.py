@@ -133,9 +133,11 @@ class MyPlayerBrain(object):
                 ptDest = self.closestStore(self.me, self.stores).busStop
 
             if(status == "COFFEE_STORE_CAR_RESTOCKED"):
-                pickup = self.allPickups(self.me, self.passengers)
+                '''pickup = self.allPickups(self.me, self.passengers)
                 if len(pickup) != 0:
                     ptDest = pickup[0].lobby.busStop
+                '''
+                self.gameStatus("NO_PATH", self.me)
 
             if(ptDest is None):
                 return
@@ -308,6 +310,11 @@ class MyPlayerBrain(object):
             distToPassenger=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, passenger.lobby.busStop))
             distToDest=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, passenger.destination.busStop))
             cost=( distToPassenger + distToDest) / passenger.pointsDelivered
+            for enemy in passenger.enemies:
+                if enemy in passenger.destination.passengers:
+                    #GFTO
+                    print ("enemy at destination for passenger: ", passenger)
+                    cost += 20
             passengerCosts.append((passenger,cost))
 
         # sort & print
@@ -335,7 +342,7 @@ class MyPlayerBrain(object):
                 if enemy in passenger.destination.passengers:
                     #GFTO
                     print ("enemy at destination for passenger: ", passenger)
-                    cost += 500
+                    cost += 20
 
             passengerCosts.append((passenger,cost))
 
