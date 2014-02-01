@@ -134,8 +134,12 @@ class MyPlayerBrain(object):
                 ptDest = self.closestStore(self.me, self.stores).busStop
             """
 
-            #get coffee if we're ever out and don't have a passenger
-            if (self.me.limo.coffeeServings <= 0 and self.me.limo.passenger is None) :
+            #get coffee if we're ever out and don't have a passenger, or if close to a coffee store anyway, pick up
+            if (self.me.limo.coffeeServings <= 0 and
+                self.me.limo.passenger is None
+                or (self.me.limo.coffeServings == 1 and
+                    self.me.limo.passenger is None and
+                    self.closestStoreCost(self.me, self.stores).busStop <= 10)) :
                 print "looking for coffee"
                 ptDest = self.closestStore(self.me, self.stores).busStop
 
@@ -143,12 +147,12 @@ class MyPlayerBrain(object):
                 pickup = self.allPickups(self.me, self.passengers)
                 if len(pickup) != 0:
                     ptDest = pickup[0].lobby.busStop
-            
+
             if(ptDest == None):
                 return
-            
+
             self.displayOrders(ptDest)
-            
+
             # get the path from where we are to the dest.
             path = self.calculatePathPlus1(self.me, ptDest)
 
@@ -189,7 +193,7 @@ class MyPlayerBrain(object):
         if len(path) > 1:
             path.append(path[-2])
         return path
-    
+
     def maybePlayPowerUp(self):
 
         # not enough, draw
@@ -202,7 +206,7 @@ class MyPlayerBrain(object):
                 self.powerUpHand.append(card)
                 playerPowerSend(self, "DRAW", card)
             return
-        
+
         # can we play one?
         okToPlayHand = filter(lambda p: p.okToPlay, self.powerUpHand)
         if len(okToPlayHand) == 0:
@@ -212,7 +216,7 @@ class MyPlayerBrain(object):
         if (powerUp.card == "MULT_DELIVERY_QUARTER_SPEED"):
             playerPowerSend(self, "DISCARD", powerUp)
             return
-        
+
         if (powerUp.card == "MULT_DELIVERING_PASSENGER" or
             powerUp.card == "MULT_DELIVER_AT_COMPANY" or
             powerUp.card == "MULT_DELIVERY_QUARTER_SPEED"):
@@ -258,16 +262,16 @@ class MyPlayerBrain(object):
 
         print "Playing powerup " + powerUp.card
         self.powerUpHand.remove(powerUp)
-        
+
         return
-    
+
     # A power-up was played. It may be an error message, or success.
     def powerUpStatus(self, status, playerPowerUp, cardPlayed):
         # redo the path if we got relocated
         if((status == "POWER_UP_PLAYED") and ((cardPlayed.card == "RELOCATE_ALL_CARS") or ((cardPlayed.card == "CHANGE_DESTINATION") and (cardPlayed.player.guid == self.me.guid)))):
             self.gameStatus("NO_PATH", self.me)
         return
-    
+
     def displayStatus(self, status, plyrStatus):
         msg = ""
         # Sometimes, myPassenger or myPassenger.lobby is None. If you want to figure this
@@ -294,11 +298,11 @@ class MyPlayerBrain(object):
             msg = "{0} delivered at {1}, new passenger refused to board limo, no coffee".format(self.myPassenger.name, self.myPassenger.lobby.name)
         elif(status == "COFFEE_STORE_CAR_RESTOCKED"):
             msg = "Coffee restocked!"
-        
+
         if(msg != ""):
             print (msg)
         return
-    
+
     def allPickups (self, me, passengers):
             pickup = [p for p in passengers if (not p in me.passengersDelivered and
                                                 p != me.limo.passenger and
@@ -311,6 +315,15 @@ class MyPlayerBrain(object):
                 cost=( distToPassenger + distToDest) / passenger.pointsDelivered
                 passengerCosts.append((passenger,cost))
 
+            # eliminate passengers someone else will get first
+            handicap=0
+            for i,passenger in enumerate(pickup):
+                for player in self.players:
+                    if(player.pickup is not None):
+                        if(passenger in player.pickup and not player.limo.passenger is None):
+                            if(len(player.limo.path)<(len(me.limo.path)-handicap)):
+                                print("Someone else would get there first\n Removing "+str(i)+" of "+str(len(pickup)))
+                                del pickup[i]
             # sort & print
             passengerCosts=sorted(passengerCosts,key=lambda x:x[1])
             print passengerCosts
@@ -330,13 +343,16 @@ class MyPlayerBrain(object):
                 cost=( distToPassenger + distToDest) / passenger.pointsDelivered
                 passengerCosts.append((passenger,cost))
 
-
             # eliminate passengers someone else will get first
+            handicap=0
             for i,passenger in enumerate(pickup):
                 for player in self.players:
-                    if(passenger in player.pickup[0]):
-                        if(len(player.limo.path)<(len(me.limo.path)-2)):
-                            del pickup[i]
+                    if(player.pickup is not None):
+                        if(passenger in player.pickup and not player.limo.passenger is None):
+                            if(len(player.limo.path)<(len(me.limo.path)-handicap)):
+                                print("Someone else would get there first\n Removing "+str(i)+" of "+str(len(pickup)))
+                                del pickup[i]
+
 
 
             # sort
