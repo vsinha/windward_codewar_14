@@ -127,8 +127,8 @@ class MyPlayerBrain(object):
             # get coffee if we're ever out and don't have a passenger, or if close to a coffee store anyway, pick up
 
             if (self.me.limo.passenger is None and
-                    (self.me.limo.coffeeServings is 0) or
-                    (self.me.limo.coffeeServings is 1 and self.closestStore(self.me, self.stores) <= 10)):
+                    ((self.me.limo.coffeeServings is 0) or
+                    (self.me.limo.coffeeServings is 1 and self.closestStoreCost(self.me, self.stores) <= 10))):
                 print "looking for coffee"
                 ptDest = self.closestStore(self.me, self.stores).busStop
 
@@ -240,6 +240,11 @@ class MyPlayerBrain(object):
             if len(playersWithPassengers) == 0:
                 return
             powerUp.player = playersWithPassengers[0]
+
+        if powerUp.card == "RELOCATE_ALL_CARS":
+            # don't play the relocate card if we have a passenger
+            if not self.me.limo.passenger:
+                return
 
 
         #if we get here, just play the card
