@@ -245,6 +245,7 @@ def playersFromXml(element):
 
 def updatePlayersFromXml(companies, players, passengers, element):
     """Update a list of Player objects with passengers from the given XML."""
+
     for playerElement in element.findall('player'):
         player = [p for p in players if p.guid == playerElement.get('guid')][0]
         # player score (this round)
