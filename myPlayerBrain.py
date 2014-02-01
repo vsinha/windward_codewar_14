@@ -262,5 +262,16 @@ class MyPlayerBrain(object):
                                                 p != me.limo.passenger and
                                                 p.car is None and
                                                 p.lobby is not None and p.destination is not None)]
-            rand.shuffle(pickup)
-            return pickup
+            passengerCosts=[]
+            for passenger in pickup:
+                distToPassenger=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, passenger.lobby.busStop))
+                distToDest=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, passenger.destination.busStop))
+                cost=distToPassenger + distToDest
+                passengerCosts.append((passenger,cost))
+
+            passengerCosts=sorted(passengerCosts,key=lambda x:x[1])
+
+
+            print passengerCosts
+
+            return [p[0] for p in passengerCosts]
