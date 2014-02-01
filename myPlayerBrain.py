@@ -134,12 +134,8 @@ class MyPlayerBrain(object):
                 ptDest = self.closestStore(self.me, self.stores).busStop
             """
 
-            #get coffee if we're ever out and don't have a passenger, or if close to a coffee store anyway, pick up
-            if (self.me.limo.coffeeServings <= 0 and
-                self.me.limo.passenger is None
-                or (self.me.limo.coffeServings == 1 and
-                    self.me.limo.passenger is None and
-                    self.closestStoreCost(self.me, self.stores).busStop <= 10)) :
+            #get coffee if we're ever out and don't have a passenger
+            if (self.me.limo.coffeeServings <= 0 and self.me.limo.passenger is None) :
                 print "looking for coffee"
                 ptDest = self.closestStore(self.me, self.stores).busStop
 
@@ -315,15 +311,6 @@ class MyPlayerBrain(object):
                 cost=( distToPassenger + distToDest) / passenger.pointsDelivered
                 passengerCosts.append((passenger,cost))
 
-            # eliminate passengers someone else will get first
-            handicap=0
-            for i,passenger in enumerate(pickup):
-                for player in self.players:
-                    if(player.pickup is not None):
-                        if(passenger in player.pickup and not player.limo.passenger is None):
-                            if(len(player.limo.path)<(len(me.limo.path)-handicap)):
-                                print("Someone else would get there first\n Removing "+str(i)+" of "+str(len(pickup)))
-                                del pickup[i]
             # sort & print
             passengerCosts=sorted(passengerCosts,key=lambda x:x[1])
             print passengerCosts
@@ -343,16 +330,13 @@ class MyPlayerBrain(object):
                 cost=( distToPassenger + distToDest) / passenger.pointsDelivered
                 passengerCosts.append((passenger,cost))
 
+
             # eliminate passengers someone else will get first
-            handicap=0
             for i,passenger in enumerate(pickup):
                 for player in self.players:
-                    if(player.pickup is not None):
-                        if(passenger in player.pickup and not player.limo.passenger is None):
-                            if(len(player.limo.path)<(len(me.limo.path)-handicap)):
-                                print("Someone else would get there first\n Removing "+str(i)+" of "+str(len(pickup)))
-                                del pickup[i]
-
+                    if(passenger in player.pickup[0]):
+                        if(len(player.limo.path)<(len(me.limo.path)-2)):
+                            del pickup[i]
 
 
             # sort
