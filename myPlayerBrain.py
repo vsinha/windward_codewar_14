@@ -289,8 +289,7 @@ class MyPlayerBrain(object):
 
     def isOthersPriority(self, passenger):
         for player in self.players:
-            if(player.pickup):
-                if(passenger is player.pickup[0] and player.limo.passenger is not None):
+            if(player.pickup and passenger is player.pickup[0] and player.limo.passenger is not None):
                     if(len(simpleAStar.calculatePath(self.gameMap, self.me.limo.tilePosition, passenger.lobby.busStop))>(len(simpleAStar.calculatePath(self.gameMap, player.limo.tilePosition, passenger.lobby.busStop))-0)):
                         print ("Someone else would get there first", passenger)
                         return True
@@ -331,6 +330,13 @@ class MyPlayerBrain(object):
             distToPassenger=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, passenger.lobby.busStop))
             distToDest=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, passenger.destination.busStop))
             cost=( distToPassenger + distToDest) / passenger.pointsDelivered
+
+            for enemy in passenger.enemies:
+                if enemy in passenger.destination.passengers:
+                    #GFTO
+                    print ("enemy at destination for passenger: ", passenger)
+                    cost += 500
+
             passengerCosts.append((passenger,cost))
 
         # sort
