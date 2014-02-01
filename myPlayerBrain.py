@@ -303,11 +303,23 @@ class MyPlayerBrain(object):
             print (msg)
         return
 
+    def isOthersPriority(self, passenger):
+        for player in self.players:
+            if(player.pickup):
+                if(passenger is player.pickup[0] and player.limo.passenger is not None):
+                    if(len(simpleAStar.calculatePath(self.gameMap, self.me.limo.tilePosition, passenger.lobby.busStop))>(len(simpleAStar.calculatePath(self.gameMap, player.limo.tilePosition, passenger.lobby.busStop))-0)):
+                        print("Someone else would get there first\n Removing "+str(i)+" of "+str(len(pickup)))
+                        return True
+
     def allPickups (self, me, passengers):
             pickup = [p for p in passengers if (not p in me.passengersDelivered and
                                                 p != me.limo.passenger and
                                                 p.car is None and
                                                 p.lobby is not None and p.destination is not None)]
+
+            # eliminate passengers someone else will get first
+            pickup=[p for p in pickup if not self.isOthersPriority(p)]
+
             passengerCosts=[]
             for passenger in pickup:
                 distToPassenger=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, passenger.lobby.busStop))
@@ -315,15 +327,10 @@ class MyPlayerBrain(object):
                 cost=( distToPassenger + distToDest) / passenger.pointsDelivered
                 passengerCosts.append((passenger,cost))
 
-            # eliminate passengers someone else will get first
-            handicap=0
-            for i,passenger in enumerate(pickup):
-                for player in self.players:
-                    if(player.pickup is not None):
-                        if(passenger is player.pickup[0] and player.limo.passenger is not None):
-                            if(len(player.limo.path)<(len(me.limo.path)-handicap)):
-                                print("Someone else would get there first\n Removing "+str(i)+" of "+str(len(pickup)))
-                                del pickup[i]
+
+
+
+
             # sort & print
             passengerCosts=sorted(passengerCosts,key=lambda x:x[1])
             print passengerCosts
@@ -336,6 +343,10 @@ class MyPlayerBrain(object):
                                                 p != me.limo.passenger and
                                                 p.car is None and
                                                 p.lobby is not None and p.destination is not None)]
+
+            # eliminate passengers someone else will get first
+            pickup=[p for p in pickup if not self.isOthersPriority(p)]
+
             passengerCosts=[]
             for passenger in pickup:
                 distToPassenger=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, passenger.lobby.busStop))
@@ -343,15 +354,7 @@ class MyPlayerBrain(object):
                 cost=( distToPassenger + distToDest) / passenger.pointsDelivered
                 passengerCosts.append((passenger,cost))
 
-            # eliminate passengers someone else will get first
-            handicap=0
-            for i,passenger in enumerate(pickup):
-                for player in self.players:
-                    if(player.pickup is not None):
-                        if(passenger is player.pickup[0] and player.limo.passenger is not None):
-                            if(len(player.limo.path)<(len(me.limo.path)-handicap)):
-                                print("Someone else would get there first\n Removing "+str(i)+" of "+str(len(pickup)))
-                                del pickup[i]
+
 
 
 
