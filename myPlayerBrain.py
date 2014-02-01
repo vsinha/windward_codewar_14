@@ -271,6 +271,8 @@ class MyPlayerBrain(object):
 
             passengerCosts=sorted(passengerCosts,key=lambda x:x[1])
 
+            for n in range(0, len(passengerCosts)):
+                passengerCosts[n] = ( passengerCosts[n][0], passengerCosts[n][1] / passengerCosts[n][0].pointsDelivered )
 
             print passengerCosts
 
