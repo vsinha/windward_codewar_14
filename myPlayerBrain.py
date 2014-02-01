@@ -301,7 +301,7 @@ class MyPlayerBrain(object):
                                             p.lobby is not None and p.destination is not None)]
 
         # eliminate passengers someone else will get first
-        pickup=[p for p in pickup if not self.isOthersPriority(p)]
+        #pickup=[p for p in pickup if not self.isOthersPriority(p)]
 
         passengerCosts=[]
         for passenger in pickup:
@@ -323,7 +323,7 @@ class MyPlayerBrain(object):
                                             p.lobby is not None and p.destination is not None)]
 
         # eliminate passengers someone else will get first
-        pickup=[p for p in pickup if not self.isOthersPriority(p)]
+        #pickup=[p for p in pickup if not self.isOthersPriority(p)]
 
         passengerCosts=[]
         for passenger in pickup:
