@@ -17,7 +17,7 @@ from debug import trap, printrap
 
 #local machine
 #DEFAULT_ADDRESS = "k9-00.cs.purdue.edu"
-DEFAULT_ADDRESS = "127.0.0.1"
+DEFAULT_ADDRESS = "128.10.15.117"
 
 cardLastPlayed = None
 cardLastSendTime = datetime.datetime.now()

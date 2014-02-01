@@ -7,3 +7,11 @@
   ----------------------------------------------------------------------------
   """
 
+class Route(object):
+    def __init__(self, startpoint, endpoint, person, length):
+        self.startpoint = startpoint
+        self.endpoint = endpoint
+        self.person = person
+        self.length = length
+
+
