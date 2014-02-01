@@ -52,7 +52,7 @@ def calculatePath(gmap, start, end):
 
         # get the neighbors
         tpClosest = None
-        for ptOffset in OFFSETS:
+        for n,ptOffset in enumerate(OFFSETS):
             pointNeighbor = (tpOn.mapTile[0] + ptOffset[0], tpOn.mapTile[1] + ptOffset[1])
             square = gmap.squareOrDefault(pointNeighbor)
             # off the map or not a road/bus stop
@@ -177,6 +177,7 @@ class TrailPoint(object):
 
         """
         self.mapTile = point
+        self.previousTile=None
         self.neighbors = []
         self.costToEnd = abs(point[0] - end[0]) + abs(point[1] - end[1])
         self.costFromStart = costFromStart
