@@ -134,8 +134,12 @@ class MyPlayerBrain(object):
                 ptDest = self.closestStore(self.me, self.stores).busStop
             """
 
-            #get coffee if we're ever out and don't have a passenger
-            if (self.me.limo.coffeeServings <= 0 and self.me.limo.passenger is None) :
+            #get coffee if we're ever out and don't have a passenger, or if close to a coffee store anyway, pick up
+            if (self.me.limo.coffeeServings <= 0 and
+                self.me.limo.passenger is None
+                or (self.me.limo.coffeServings == 1 and
+                    self.me.limo.passenger is None and
+                    self.closestStoreCost(self.me, self.stores).busStop <= 10)) :
                 print "looking for coffee"
                 ptDest = self.closestStore(self.me, self.stores).busStop
 
