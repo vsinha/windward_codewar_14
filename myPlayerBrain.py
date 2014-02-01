@@ -127,9 +127,10 @@ class MyPlayerBrain(object):
             # coffee store override
             if(status == "PASSENGER_DELIVERED_AND_PICKED_UP" or status == "PASSENGER_DELIVERED" or status == "PASSENGER_ABANDONED"):
                 if(self.me.limo.coffeeServings <= 0):
-                    ptDest = rand.choice(self.stores).busStop
+                    #ptDest = rand.choice(self.stores).busStop #wat... goes to random coffee place
+                    ptDest = self.closestStore(self.me, self.stores).busStop
             elif(status == "PASSENGER_REFUSED_NO_COFFEE" or status == "PASSENGER_DELIVERED_AND_PICK_UP_REFUSED"):
-                ptDest = rand.choice(self.stores).busStop
+                ptDest = self.closestStore(self.me, self.stores).busStop
             elif(status == "COFFEE_STORE_CAR_RESTOCKED"):
                 pickup = self.allPickups(self.me, self.passengers)
                 if len(pickup) != 0:
@@ -266,19 +267,45 @@ class MyPlayerBrain(object):
             for passenger in pickup:
                 distToPassenger=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, passenger.lobby.busStop))
                 distToDest=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, passenger.destination.busStop))
-                cost=distToPassenger + distToDest
+                cost=( distToPassenger + distToDest) / passenger.pointsDelivered
                 passengerCosts.append((passenger,cost))
-
-            # print before weighting
-            # passengerCosts=sorted(passengerCosts,key=lambda x:x[1])
-            # print passengerCosts
-
-            # weight for points by passenger
-            for n in range(0, len(passengerCosts)):
-                passengerCosts[n] = ( passengerCosts[n][0], passengerCosts[n][1] / passengerCosts[n][0].pointsDelivered )
 
             # sort & print
             passengerCosts=sorted(passengerCosts,key=lambda x:x[1])
             print passengerCosts
 
+            # returns passenger object
             return [p[0] for p in passengerCosts]
+
+    def allPickupCosts (self, me, passengers):
+            pickup = [p for p in passengers if (not p in me.passengersDelivered and
+                                                p != me.limo.passenger and
+                                                p.car is None and
+                                                p.lobby is not None and p.destination is not None)]
+            passengerCosts=[]
+            for passenger in pickup:
+                distToPassenger=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, passenger.lobby.busStop))
+                distToDest=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, passenger.destination.busStop))
+                cost=( distToPassenger + distToDest) / passenger.pointsDelivered
+                passengerCosts.append((passenger,cost))
+
+            # sort
+            passengerCosts=sorted(passengerCosts,key=lambda x:x[1])
+
+            # returns cost
+            return [p[1] for p in passengerCosts]
+
+    def closestStore(self, me, stores):
+        print "looking for coffee"
+        storeCosts=[]
+        for store in stores:
+            distToStore=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, store.lobby.busStop))
+            distToNextPickup = self.allPickupCosts(me, self.passengers)[1]
+            cost = distToStore + distToNextPickup
+            storeCosts.append((store,cost))
+
+        # sort
+        storeCosts = sorted(storeCosts, key=lambda x:x[1])
+        print storeCosts
+
+        return [s[1] for s in storeCosts]
