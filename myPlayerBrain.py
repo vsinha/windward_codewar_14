@@ -12,8 +12,8 @@ import traceback
 import simpleAStar
 from framework import sendOrders, playerPowerSend
 
-NAME = "Guido van Rossum"
-SCHOOL = "Windward U."
+NAME = "Sunshine Ponies"
+SCHOOL = "Purdue"
 
 class MyPlayerBrain(object):
     """The Python AI class.  This class must have the methods setup and gameStatus."""
