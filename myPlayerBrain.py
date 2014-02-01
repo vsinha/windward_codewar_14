@@ -139,7 +139,7 @@ class MyPlayerBrain(object):
                 self.me.limo.passenger is None
                 or (self.me.limo.coffeServings == 1 and
                     self.me.limo.passenger is None and
-                    self.closestStoreCost(self.me, self.stores).busStop <= 10)) :
+                    self.closestStoreCost(self.me, self.stores) <= 10)) :
                 print "looking for coffee"
                 ptDest = self.closestStore(self.me, self.stores).busStop
 
