@@ -357,7 +357,7 @@ class MyPlayerBrain(object):
         storeCosts=[]
         for store in stores:
             distToStore=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, store.busStop))
-            distToNextPickup = self.allPickupCosts(me, self.passengers)[1]
+            distToNextPickup = self.allPickupCosts(me, self.passengers)[0]
             cost = distToStore + distToNextPickup
             storeCosts.append((store,cost))
 
@@ -370,7 +370,7 @@ class MyPlayerBrain(object):
         storeCosts=[]
         for store in stores:
             distToStore=len(simpleAStar.calculatePath(self.gameMap, me.limo.tilePosition, store.busStop))
-            distToNextPickup = self.allPickupCosts(me, self.passengers)[1]
+            distToNextPickup = self.allPickupCosts(me, self.passengers)[0]
             cost = distToStore + distToNextPickup
             storeCosts.append((store,cost))
 
