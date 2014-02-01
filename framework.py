@@ -18,8 +18,8 @@ from debug import trap, printrap
 #local machine
 #DEFAULT_ADDRESS = "k9-00.cs.purdue.edu" #ompetition server
 #DEFAULT_ADDRESS = "10.184.66.56" #viraj laptop
-DEFAULT_ADDRESS = "128.10.15.117" #desktop
-#DEFAULT_ADDRESS = "127.0.0.1" #localhost
+#DEFAULT_ADDRESS = "128.10.15.117" #desktop
+DEFAULT_ADDRESS = "127.0.0.1" #localhost
 
 cardLastPlayed = None
 cardLastSendTime = datetime.datetime.now()

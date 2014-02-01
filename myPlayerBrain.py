@@ -122,7 +122,7 @@ class MyPlayerBrain(object):
                 pickups = self.allPickups(self.me, self.passengers)
                 for p in pickups:
                     if p is not self.me.limo.passenger.destination:
-                        ptDest = p
+                        ptDest = p.lobby.busStop
                         break
 
             elif (status == "PASSENGER_DELIVERED_AND_PICKED_UP" or
@@ -131,8 +131,9 @@ class MyPlayerBrain(object):
                 ptDest = self.me.limo.passenger.destination.busStop
                 
             # coffee store override
+            print (self.me.limo.coffeeServings)
             # get coffee if we're ever out and don't have a passenger, or if close to a coffee store anyway, pick up
-            if (self.me.limo.coffeeServings <= 1) :
+            if ((status == "PASSENGER_NO_ACTION" or status == "NO_PATH" or status == "PASSENGER_DELIVERED" or status == "PASSENGER_ABANDONED") and self.me.limo.coffeeServings <= 1) :
                 if (self.me.limo.passenger is None and
                         ((self.me.limo.coffeeServings == 0) or
                         (self.me.limo.coffeeServings == 1 and self.closestStoreCost(self.me, self.stores) <= 10))):
