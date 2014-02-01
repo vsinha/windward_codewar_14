@@ -65,8 +65,11 @@ class MyPlayerBrain(object):
         self.pickup = pickup = self.allPickups(me, passengers)
 
         # get the path from where we are to the dest.
+        pickup = self.allPickups(self.me, self.passengers)
+        ptDest = pickup[0].lobby.busStop
+        path = self.calculatePathPlus1(self.me, ptDest)
 
-        path = self.calculatePathPlus1(me, pickup[0].lobby.busStop)
+
         sendOrders(self, "ready", path, pickup)
 
     def gameStatus(self, status, playerStatus):
